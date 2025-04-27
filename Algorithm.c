@@ -119,3 +119,112 @@ int main(void) {
 }
 
 #endif 
+
+
+#if 0
+// 백준 20055
+// 문제점 1: 문제 이해 x
+// 로봇이 상차 진행 시, 하차 위치에서 하차 (x) >> 로봇이 하차 위치 도착 즉시 하차 수행 (o)
+// 문제점 2: "%" 연산 오류 
+// i = -1 % 5 
+// printf("%d", i) >> -1 출력
+// issue 1) if (i == up) break; // 이게 for 문 조건 안에 있으면 오류!
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+
+#define MAX_N 100 + 1
+
+int N = 0;
+int K = 0;
+int HP_belt[2 * MAX_N] = { 0 };
+int Robot_pos[2 * MAX_N] = { 0 };
+
+void input_data(void) {
+	(void)scanf("%d %d", &N, &K);
+	for (int i = 0; i < 2 * N; ++i) {
+		(void)scanf("%d", HP_belt + i);
+	}
+	return;
+}
+void print_data(void) {
+	for (int i = 0; i < 2 * N; ++i) {
+		printf("%2d ", HP_belt[i]);
+	}
+	printf("\n");
+}
+void print_data_blank(void) {
+	for (int i = 0; i < 2 * N; ++i) {
+		printf("%2d ", Robot_pos[i]);
+	}
+	printf("\n");
+}
+
+int search_zero(void) {
+	int cnt = 0;
+	for (int i = 0; i < 2 * N; ++i) {
+		if (!HP_belt[i]) ++cnt;
+	}
+	return cnt;
+}
+
+
+int solve() {
+	int time = 0;
+	int cnt_zero = search_zero();
+	int up = 0;
+	int down = N - 1; // 배열 idx 0부터 시작 고려 
+	int target = 0;
+
+	while (cnt_zero < K) {
+		++time;
+
+		// 상차 & 하차 index update
+		if (--up < 0) up += 2 * N;
+		if (--down < 0) down += 2 * N;
+
+		// blank & HP 배열 update
+
+		target = down;
+		Robot_pos[target] = 0; // 문제에서 로봇이 하차 위치 도착하면 바로 하차 수행
+
+		for (int i = down - 1;; --i) {
+			//i %= 2 * n; 왼쪽과 같이 작성 시, i에 음수값 입력 > 아래와 같이 수정 
+			
+			if (i < 0) i += 2 * N;
+
+			if (Robot_pos[target] == 0 && HP_belt[target] > 0 && Robot_pos[i] == 1) {
+				Robot_pos[target] = 1;
+				--HP_belt[target];
+				Robot_pos[i] = 0;
+			}
+			target = i;
+			if (i == up) break; // 이게 for 문 조건 안에 있으면 오류!
+
+		}
+
+		// 상차 하차 수행
+		if (HP_belt[up] > 0) {
+			--HP_belt[up];
+			Robot_pos[up] = 1;
+		}
+		Robot_pos[down] = 0;
+
+		// 내구도 카운트
+		cnt_zero = search_zero();
+	}
+
+	return time;
+}
+
+int main(void) {
+
+	freopen("B20055.txt", "r", stdin);
+	input_data();
+	printf("%d\n", solve());
+
+	return 0;
+}
+
+#endif
