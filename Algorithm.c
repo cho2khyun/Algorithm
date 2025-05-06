@@ -191,7 +191,7 @@ int solve() {
 
 		for (int i = down - 1;; --i) {
 			//i %= 2 * n; 왼쪽과 같이 작성 시, i에 음수값 입력 > 아래와 같이 수정 
-			
+
 			if (i < 0) i += 2 * N;
 
 			if (Robot_pos[target] == 0 && HP_belt[target] > 0 && Robot_pos[i] == 1) {
@@ -200,7 +200,7 @@ int solve() {
 				Robot_pos[i] = 0;
 			}
 			target = i;
-			if (i == up) break; // 이게 for 문 조건 안에 있으면 오류!
+			if (i == up) break; // 이게 for 문 조건 안에 있으면 오류! >> for문 내에서 i값을 수정하기 전에 종료문을 수행하기 때문에 발생한 오류.
 
 		}
 
@@ -226,5 +226,116 @@ int main(void) {
 
 	return 0;
 }
+
+#endif
+
+#if 01
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_N 20 +2
+
+int N = 0;
+int map[MAX_N][MAX_N] = { 0 };
+int visit[MAX_N][MAX_N] = { 0 };
+
+typedef struct _Node {
+	int curr_row;
+	int curr_col;
+}node;
+
+node shark; 
+int shark_val = 0; // 상어 덩치
+int shark_val_cnt = 0; // 상어 덩치 키우는 값
+
+node queue[1000];
+int front = 0;
+int rear = 0;
+
+void enque(int r, int c) {
+	node temp;
+	temp.curr_row = r;
+	temp.curr_col = c;
+
+	queue[++rear] = temp;
+	return;
+}
+
+node deque(void) {
+	return queue[front++];
+}
+
+void input_data(void) {
+	(void)scanf("%d", &N);
+
+	for (int i = 0; i < N; ++i) {
+		for (int j = 0; j < N; ++j) {
+			(void)scanf("%d", &map[i][j]);
+			if (map[i][j] == 9) {
+				shark.curr_row = i;
+				shark.curr_col = j;
+				shark_val = 2;
+			}
+		}
+	}
+
+	return;
+}
+
+void solve(void) {
+	int dr[4] = { -1,1,0,0 };
+	int dc[4] = { 0,0,-1,1 };
+	int next_r = shark.curr_row;
+	int next_c = shark.curr_col;
+	int inst_time = 0;
+	node temp;
+
+	//물고기 다 먹을 때, while문 종료
+	while (1) {
+
+		// 물고기 하나 먹을 때마다 while문 종료
+		while (front != rear) {
+			temp = deque();
+
+			// 상어의 현재 위치에 먹을 물고기가 있는 경우
+			if (map[temp.curr_row][temp.curr_col] > 0 && shark_val > map[temp.curr_row][temp.curr_col]) {
+				++shark_val_cnt;
+				// 상어 덩치 update
+				if (shark_val_cnt >= shark_val) {
+					++shark_val;
+					shark_val_cnt = 0;
+				}
+				break;
+			}
+
+			for (int i = 0; i < 4; ++i) {
+				next_r = temp.curr_row + dr[i];
+				next_c = temp.curr_col + dc[i];
+				// 맵 범위 벗어남 or 못먹는 물고기 = continue
+				if (next_r < 0 || next_c < 0 || next_r > N || next_c > N || map[next_r][next_c] > shark_val) continue;
+
+				if (visit[next_r][next_c] ==  0) {
+					enque(next_r, next_c);
+					visit[next_r][next_c] = 1;
+				}
+			}
+
+		}
+
+	}
+
+
+
+	return;
+}
+
+
+int main(void) {
+	input_data();
+
+	return 0;
+}
+
 
 #endif
