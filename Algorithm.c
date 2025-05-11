@@ -229,7 +229,8 @@ int main(void) {
 
 #endif
 
-#if 01
+#if 0
+// B16236
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
@@ -334,6 +335,116 @@ void solve(void) {
 int main(void) {
 	input_data();
 
+	return 0;
+}
+
+
+#endif
+
+#if 0
+// B9205
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_N 100 + 1
+
+int test_case = 0;
+int N = 0;
+
+typedef struct _node {
+	int x;
+	int y;
+}node;
+
+node CURR;
+node CS[MAX_N];
+int visit[MAX_N];
+node DEST;
+int flag = 0;
+
+node queue[MAX_N * MAX_N];
+int front, rear;
+
+void input_data(void) {
+	(void)scanf("%d", &N);
+	(void)scanf("%d %d", &CURR.x, &CURR.y);
+	for (int i = 0; i < N; ++i) {
+		(void)scanf("%d %d", &CS[i].x, &CS[i].y);
+	}
+	(void)scanf("%d %d", &DEST.x, &DEST.y);
+	return;
+}
+
+void print_data(void) {
+	for (int i = 0; i < N; ++i) {
+		printf("%d %d", CS[i].x, CS[i].y);
+	}
+	printf("%d %d", DEST.x, DEST.y);
+	return;
+}
+
+int check_dist(node node1, node node2) {
+	return abs(node1.x - node2.x) + abs(node1.y - node2.y);
+}
+
+void enque(node temp) {
+	queue[rear++] = temp;
+	return;
+}
+node deque(void) {
+	return queue[front++];
+}
+
+void BFS(void) {
+	
+	if (1000 >= check_dist(CURR, DEST)) {
+		flag = 1;
+		return;
+	}
+
+	enque(CURR);
+	node temp;
+	int check;
+	while (front != rear) {
+		temp = deque();
+		
+		for (int i = 0; i < N; ++i) {
+			if (check_dist(temp, CS[i]) > 1000 || visit[i] == 1) continue;
+			if (1000 >= check_dist(CS[i], DEST)) {
+				flag = 1;
+				return;
+			}
+			enque(CS[i]);
+			visit[i] = 1;
+		}
+	}
+	return;
+}
+
+void Init(void) {
+	flag = 0;
+	for (int i = 0; i < N; ++i) {
+		visit[i] = 0;
+	}
+	front = rear = 0;
+}
+
+int main(void) {
+
+	//(void)freopen("B9205.txt", "r", stdin);
+
+	(void)scanf("%d", &test_case);
+
+	for (int i = 0; i < test_case; ++i) {
+		input_data();
+		//print_data();
+		BFS();
+		if (flag == 1) printf("happy\n");
+		else printf("sad\n");
+		Init();
+	}
 	return 0;
 }
 
